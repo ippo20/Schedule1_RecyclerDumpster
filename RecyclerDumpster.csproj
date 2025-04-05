@@ -471,7 +471,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Include="BoxDimensions.cs" />
 		<Compile Include="Core.cs" />
 		<Compile Include="TrashValueRepository.cs" />
 	</ItemGroup>
