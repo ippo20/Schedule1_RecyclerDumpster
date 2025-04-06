@@ -1,25 +1,29 @@
-﻿using MelonLoader;
+//using System.Reflection;
+using MelonLoader;
 using UnityEngine;
 using Il2CppScheduleOne.Trash;
 using HarmonyLib;
 using Il2CppScheduleOne.Money;
 using System.Collections;
-using Il2CppScheduleOne.ObjectScripts;
-using Il2CppScheduleOne.Audio;
+////using static Il2CppSystem.Linq.Expressions.Interpreter.NullableMethodCallInstruction;
+//using UnityEngine.Playables;
+//using Il2CppScheduleOne.ObjectScripts;
 
-[assembly: MelonInfo(typeof(RecyclerDumpster.Core), "RecyclerDumpster", "1.0.0", "ippo", null)]
+//using Il2CppSystem.Collections.Generic;
+
+[assembly: MelonInfo(typeof(RecyclerDumpsterMod.Core), "RecyclerDumpster", "1.0.0", "ippo", null)]
 [assembly: MelonGame("TVGS", "Schedule I")]
 
-namespace RecyclerDumpster
+namespace RecyclerDumpsterMod
 {
     [HarmonyPatch(typeof(TrashItem))]
     [HarmonyPatch("AddTrash")]
     [HarmonyPatch(new Type[] { typeof(TrashItem) })]
-
     public class Core : MelonMod
     {
-        private MoneyManager moneyManager;
-
+        private MoneyManager _moneyManager;
+        private List<GameObject> _recDumpCache = new List<GameObject>();
+        private GameObject _localPlayer;
         public override void OnInitializeMelon()
         {
             MelonLogger.Msg("RecyclerDumpster initialized.");
@@ -27,136 +31,96 @@ namespace RecyclerDumpster
 
         public override void OnUpdate()
         {
-            if (Input.GetKeyDown(KeyCode.RightBracket)) // ']' key
+            if (this._localPlayer == null)
             {
-                TryRecycler();
+                this._localPlayer = GameObject.Find("Player_Local");
             }
-        }
 
-        private void TryRecycler()
-        {
-            GameObject player = GameObject.Find("Player_Local");
-            Vector3 pos = player.transform.position;
-            MelonLogger.Msg($"Player Position: {player.transform.position}");
-            CleanWithinVicinity(pos);
-        }
-
-        private void CleanWithinVicinity(Vector3 pos)
-        {
-            Vector3 docksDumpster = new Vector3(-69.39f, -0.9f, -63.50f); // center of dumpster
-            Vector3 docksPosition = new Vector3(-74.0796f, -1.163f, -64.8039f); // where the player stands near the docks
-
-            float playerVicinityRadius = 7f;
-            float length = 3.66f;
-            float width = 1.15f;
-            float minY = -2.4f;
-            float maxY = 0.89f;
-
-            if (Vector3.Distance(pos, docksPosition) <= playerVicinityRadius)
+            if (this._localPlayer != null)
             {
-                MelonLogger.Msg("Player is near the docks.");
-                TrashItem[] allTrashItems = GameObject.FindObjectsOfType<TrashItem>();
+                Vector3 pos = this._localPlayer.transform.position;
+                RDProcessor.GenerateClickableDumpster(_recDumpCache, pos);
 
-                int cashValue = 0;
-                foreach (TrashItem item in allTrashItems)
+                if (Input.GetKeyDown(KeyCode.RightBracket)) // ']' key
                 {
-                    if (!IsWithinRectangle(item.transform.position, docksDumpster, length, width, minY, maxY)) continue;
-                    MelonLogger.Msg($"Processing: {item.ID} at {item.transform.position}");
-
-                    if (item.ID == "trashbag")
-                    {
-                        TrashBag bag = item.GetComponent<TrashBag>();
-                        if (bag != null)
-                        {
-                            foreach (TrashContent.Entry baggedItem in bag.Content.Entries)
-                            {
-                                int c = GetValueFromRepo(baggedItem.TrashID);
-                                cashValue += c;
-                                MelonLogger.Msg($"baggedTrash: {baggedItem.TrashID} price: {c}, new cash val:{cashValue}");
-                            }
-                        }
-                        else
-                        {
-                            int c = GetValueFromRepo(item.ID);
-                            cashValue += c;
-                            MelonLogger.Msg($"trashNotBag: {item.ID} price: {c}, new cash val:{cashValue}");
-                        }
-                    }
-                    else
-                    {
-                        int c = GetValueFromRepo(item.ID);
-                        cashValue += c;
-                        MelonLogger.Msg($"trash: {item.ID} price: {c}, new cash val:{cashValue}");
-                    }
-                }
-
-                MelonLogger.Msg($"Cash grabbed total: {cashValue}");
-                if (cashValue > 0)
-                {
-                    this.moneyManager.ChangeCashBalance(cashValue, true, false);
-                    PlayCashEjectSound();
+                    //TryRecycler(pos);
+                    //DDD();
                 }
             }
         }
+        //private void DDD()
+        //{
+        //    MelonLogger.Msg($"DDD: Start");
+        //    // Replace 'Dumpster' with your desired class
+        //    var test = GameObject.FindObjectsOfType<Dumpster>();
+        //    foreach (var dumpster in test)
+        //    {
+        //        Type type = dumpster.GetType();
+        //        PropertyInfo[] properties = type.GetProperties();
+        //        MethodInfo[] methods = type.GetMethods();
 
-        private bool IsWithinRectangle(Vector3 itemPos, Vector3 center, float length, float width, float minY, float maxY)
+        //        MelonLogger.Msg($"Dumpster: {dumpster.name}");
+
+        //        // List all properties
+        //        MelonLogger.Msg("Properties:");
+        //        foreach (PropertyInfo property in properties)
+        //        {
+        //            try
+        //            {
+        //                object value = property.GetValue(dumpster, null);
+        //                MelonLogger.Msg($"  {property.Name}: {value}");
+        //                base.LoggerInstance.Msg($"  {property.Name}: {value}");
+        //            }
+        //            catch
+        //            {
+        //                MelonLogger.Msg($"  {property.Name}: (unavailable)");
+        //                base.LoggerInstance.Msg($"  {property.Name}: (unavailable)");
+        //            }
+        //        }
+                
+
+        //        // List all methods
+        //        MelonLogger.Msg("Methods:");
+        //        foreach (MethodInfo method in methods)
+        //        {
+        //            MelonLogger.Msg($"  {method.Name}");
+        //        }
+        //    }
+        //}
+        private void TryRecycler(Vector3 pos)
         {
-            float minX = center.x - length / 2f;
-            float maxX = center.x + length / 2f;
-            float minZ = center.z - width / 2f;
-            float maxZ = center.z + width / 2f;
-
-            return itemPos.x >= minX && itemPos.x <= maxX &&
-                   itemPos.y >= minY && itemPos.y <= maxY &&
-                   itemPos.z >= minZ && itemPos.z <= maxZ;
-        }
-
-        private int GetValueFromRepo(string id)
-        {
-            if (TrashValueRepository.TrashValues.TryGetValue(id, out TrashValue trashItem))
+            //MelonLogger.Msg($"Player Position: {player.transform.position}");
+            int addCash = RDProcessor.CleanWithinVicinity(pos);
+            if (addCash > 0)
             {
-                return trashItem.Value;
-            }
-            return 0;
+                _moneyManager.ChangeCashBalance(addCash, true, false);
+                RDUtility.PlayCashEjectSound();
+            }            
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
             MelonCoroutines.Start(this.WaitForMoneyManager());
+            //if (_recDumpCache.Count <= 0)
+            //{
+            //    RDProcessor.CacheGameObject(_recDumpCache);
+            //    MelonLoader.MelonLogger.Msg($"CacheGameObject [{_recDumpCache.Count}]");
+            //}
         }
 
         private IEnumerator WaitForMoneyManager()
         {
-            while (this.moneyManager == null)
+            while (this._moneyManager == null)
             {
                 GameObject moneyManagerObject = GameObject.Find("Managers/@Money");
                 if (moneyManagerObject != null)
                 {
-                    this.moneyManager = moneyManagerObject.GetComponent<MoneyManager>();
+                    this._moneyManager = moneyManagerObject.GetComponent<MoneyManager>();
                 }
                 yield return new WaitForSeconds(1f);
             }
         }
+        
 
-        public void PlayCashEjectSound()
-        {
-            // Find all AudioSources in the scene
-            var audioSources = UnityEngine.Object.FindObjectsOfType<UnityEngine.AudioSource>();
-
-            foreach (var audioSource in audioSources)
-            {
-                // Check if the clip name contains 'cash' (case-insensitive)
-                if (audioSource.clip != null && audioSource.clip.name.ToLower().Contains("cash-register-kaching-sound-effect-125042"))
-                {
-                    // Play the sound using PlayOneShot
-                    audioSource.PlayOneShot(audioSource.clip); // Play the sound once
-                    MelonLoader.MelonLogger.Msg("Cash Eject Sound Played!");
-                    return; // Stop after playing the sound once
-                }
-            }
-
-            // If no matching audio source found
-            MelonLoader.MelonLogger.Msg("No Cash Eject Sound Clip found!");
-        }
     }
 }
