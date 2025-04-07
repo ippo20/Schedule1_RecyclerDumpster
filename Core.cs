@@ -28,10 +28,23 @@ namespace RecyclerDumpsterMod
         private MoneyManager _moneyManager;
         private List<GameObject> _recDumpCache = new List<GameObject>();
         private GameObject _localPlayer;
+        private List<CreditsTo> _thx = new List<CreditsTo>()
+        {
+            new CreditsTo() { ModName = "TrashDestroyer", Author = "heimy2000" },
+            new CreditsTo() { ModName = "Golden Touch", Author = "Drakobine" },
+            new CreditsTo() { ModName = "Tips and guide", Author = "Schdule One Modding Server" },
+        };
 
         public override void OnInitializeMelon()
         {
-            MelonLogger.Msg("RecyclerDumpster initialized.");
+            MelonLogger.Msg("RecyclerDumpster initialized");
+            
+                string s = "Credits to the following: ";
+            foreach (CreditsTo thx in _thx)
+            {
+                s+=$"{thx.ModName} - {thx.Author} | ";
+            }
+            MelonLogger.Msg(s);
         }
 
         public override void OnUpdate()
@@ -106,7 +119,11 @@ namespace RecyclerDumpsterMod
                 yield return new WaitForSeconds(1f);
             }
         }
-        
+        private class CreditsTo()
+        {
+            public string ModName { get; set; }
+            public string Author { get; set; }
+        }
 
     }
 }
