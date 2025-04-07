@@ -1,0 +1,118 @@
+[
+	{
+		"ID": "waterbottle",
+		"Type": "plastic"
+	},
+	{
+		"ID": "cigarette",
+		"Type": "others"
+	},
+	{
+		"ID": "energydrink",
+		"Type": "metal"
+	},
+	{
+		"ID": "usedcigarette",
+		"Type": "others"
+	},
+	{
+		"ID": "litter1",
+		"Type": "others"
+	},
+	{
+		"ID": "crushedcuke",
+		"Type": "metal"
+	},
+	{
+		"ID": "pipe",
+		"Type": "glass"
+	},
+	{
+		"ID": "cuke",
+		"Type": "metal"
+	},
+	{
+		"ID": "plantscrap",
+		"Type": "others"
+	},
+	{
+		"ID": "cigarettebox",
+		"Type": "others"
+	},
+	{
+		"ID": "motoroil",
+		"Type": "metal"
+	},
+	{
+		"ID": "bong",
+		"Type": "glass"
+	},
+	{
+		"ID": "syringe",
+		"Type": "plastic"
+	},
+	{
+		"ID": "addy",
+		"Type": "plastic"
+	},
+	{
+		"ID": "glassbottle",
+		"Type": "glass"
+	},
+	{
+		"ID": "coffeecup",
+		"Type": "others"
+	},
+	{
+		"ID": "coffeecup",
+		"Type": "others"
+	},
+	{
+		"ID": "m1911mag",
+		"Type": "metal"
+	},
+	{
+		"ID": "revolvercylinder",
+		"Type": "metal"
+	},
+	{
+		"ID": "chemicaljug",
+		"Type": "plastic"
+	},
+	{
+		"ID": "gasoline",
+		"Type": "plastic"
+	},
+	{
+		"ID": "fertilizer",
+		"Type": "plastic"
+	},
+	{
+		"ID": "pgr",
+		"Type": "plastic"
+	},
+	{
+		"ID": "speedgrow",
+		"Type": "plastic"
+	},
+	{
+		"ID": "seedvial",
+		"Type": "plastic"
+	},
+	{
+		"ID": "acid",
+		"Type": "plastic"
+	},
+	{
+		"ID": "soilbag",
+		"Type": "others"
+	},
+	{
+		"ID": "soilbag2",
+		"Type": "others"
+	},
+	{
+		"ID": "soilbag3",
+		"Type": "others"
+	}
+]

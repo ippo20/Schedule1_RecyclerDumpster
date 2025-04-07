@@ -1,15 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net6.0-windows7.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>disable</Nullable>
-		<RootNamespace>MelonLoaderMod</RootNamespace>
+		<RootNamespace>RecyclerDumpsterMod</RootNamespace>
 		<LangVersion>default</LangVersion>
 		<IsPackable>false</IsPackable>
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 		<FileVersion>1.0.0.0</FileVersion>
 		<NeutralLanguage>en-US</NeutralLanguage>
-		<AssemblyName>RecylerDumpster</AssemblyName>
+		<AssemblyName>RecyclerDumpster</AssemblyName>
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
@@ -267,12 +267,6 @@
 		<Reference Include="UnityEngine.ClothModule">
 			<HintPath>G:\Games\Schedule I - Mod\MelonLoader\Il2CppAssemblies\UnityEngine.ClothModule.dll</HintPath>
 		</Reference>
-		<Reference Include="UnityEngine.ClusterInputModule">
-			<HintPath>G:\Games\Schedule I - Mod\MelonLoader\Il2CppAssemblies\UnityEngine.ClusterInputModule.dll</HintPath>
-		</Reference>
-		<Reference Include="UnityEngine.ClusterRendererModule">
-			<HintPath>G:\Games\Schedule I - Mod\MelonLoader\Il2CppAssemblies\UnityEngine.ClusterRendererModule.dll</HintPath>
-		</Reference>
 		<Reference Include="UnityEngine.ContentLoadModule">
 			<HintPath>G:\Games\Schedule I - Mod\MelonLoader\Il2CppAssemblies\UnityEngine.ContentLoadModule.dll</HintPath>
 		</Reference>
@@ -320,9 +314,6 @@
 		</Reference>
 		<Reference Include="UnityEngine.LocalizationModule">
 			<HintPath>G:\Games\Schedule I - Mod\MelonLoader\Il2CppAssemblies\UnityEngine.LocalizationModule.dll</HintPath>
-		</Reference>
-		<Reference Include="UnityEngine.NVIDIAModule">
-			<HintPath>G:\Games\Schedule I - Mod\MelonLoader\Il2CppAssemblies\UnityEngine.NVIDIAModule.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.ParticleSystemModule">
 			<HintPath>G:\Games\Schedule I - Mod\MelonLoader\Il2CppAssemblies\UnityEngine.ParticleSystemModule.dll</HintPath>
@@ -438,9 +429,6 @@
 		<Reference Include="UnityEngine.VideoModule">
 			<HintPath>G:\Games\Schedule I - Mod\MelonLoader\Il2CppAssemblies\UnityEngine.VideoModule.dll</HintPath>
 		</Reference>
-		<Reference Include="UnityEngine.VirtualTexturingModule">
-			<HintPath>G:\Games\Schedule I - Mod\MelonLoader\Il2CppAssemblies\UnityEngine.VirtualTexturingModule.dll</HintPath>
-		</Reference>
 		<Reference Include="UnityEngine.VRModule">
 			<HintPath>G:\Games\Schedule I - Mod\MelonLoader\Il2CppAssemblies\UnityEngine.VRModule.dll</HintPath>
 		</Reference>
@@ -468,12 +456,22 @@
 	<PropertyGroup>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+		<PlatformTarget>x64</PlatformTarget>
+		<RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+		<RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
+		<RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+		<EnableNETAnalyzers>False</EnableNETAnalyzers>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Include="BoxDimensions.cs" />
 		<Compile Include="Core.cs" />
-		<Compile Include="TrashValueRepository.cs" />
+		<Compile Include="RDProcessor.cs" />
+		<Compile Include="RDRepository.cs" />
+		<Compile Include="RDUtility.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
