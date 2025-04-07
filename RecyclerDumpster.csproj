@@ -469,6 +469,10 @@
 		<Compile Include="RDRepository.cs" />
 		<Compile Include="RDUtility.cs" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	</ItemGroup>
 	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="COPY &quot;$(TargetPath)&quot; &quot;G:\Games\Schedule I - Mod\Mods&quot; &amp;&amp; start &quot;&quot; &quot;G:\Games\Schedule I - Mod\Schedule I.exe&quot;" />

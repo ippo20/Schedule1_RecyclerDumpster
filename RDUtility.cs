@@ -1,4 +1,6 @@
-﻿using Il2CppScheduleOne.Money;
+﻿using Il2CppNewtonsoft.Json;
+using Il2CppScheduleOne.Money;
+using MelonLoader;
 using System.Collections;
 using UnityEngine;
 
@@ -8,8 +10,6 @@ namespace RecyclerDumpsterMod
     {
         private static AudioSource cachedAudioSource;
                     
-        private static readonly (float extentX, float extentY, float extentZ) extents = RDRepository.GetExtents();
-
         public static Vector3 ComputeCenter(Vector3 pos, float extentY)
         {
             // Only calculate the center for the top coverage
@@ -39,19 +39,19 @@ namespace RecyclerDumpsterMod
             return (min, max);
         }
 
-        public static (Vector3 min, Vector3 max) ComputeBoundsRounded(Vector3 pos, float extentX, float extentY, float extentZ)
+        public static (Vector3 min, Vector3 max) ComputeBoundsRounded(Vector3 pos, Vector3 extent, float offset= 0f )
         {
             // Calculate min and max points based on the passed extents and position, rounded to the nearest hundredth
             Vector3 min = new Vector3(
-                Mathf.Round((pos.x - extentX) * 100) / 100,
-                Mathf.Round((pos.y - extentY) * 100) / 100,  // Adjust pos.y for min
-                Mathf.Round((pos.z - extentZ) * 100) / 100
+                Mathf.Round((pos.x - extent.x) * 100) / 100,
+                Mathf.Round((pos.y - extent.y) * 100) / 100,  // Adjust pos.y for min
+                Mathf.Round((pos.z - extent.z) * 100) / 100
             );
-            
+                        
             Vector3 max = new Vector3(
-                Mathf.Round((pos.x + extentX) * 100) / 100,
-                Mathf.Round((pos.y + extentY) * 100) / 100,  // Adjust pos.y for max
-                Mathf.Round((pos.z + extentZ) * 100) / 100
+                Mathf.Round((pos.x + extent.x) * 100) / 100,
+                Mathf.Round((pos.y + extent.y + offset)   * 100) / 100,  // Adjust pos.y for max
+                Mathf.Round((pos.z + extent.z) * 100) / 100
             );
 
             return (min, max);
@@ -71,19 +71,13 @@ namespace RecyclerDumpsterMod
                                     (point.z - sphereCenter.z) * (point.z - sphereCenter.z);
 
             // Compare the distance squared with the radius squared (to avoid using sqrt)
+            //MelonLogger.Msg($"Distance Squared: {distanceSquared}, Radius: {radius}, Radius Squared: {radius * radius}.");
             return distanceSquared <= radius * radius;
         }
         public static int GetValueFromRepo(string id)
         {
-            int val = 0;
-            if (RDRepository.TrashValues.TryGetValue(id, out RDRepository.TrashValue trashItem))
-            {
-                val = trashItem.Value;
-            }
-           
-            MelonLoader.MelonLogger.Msg($"Item ID {id} = {val}.");
-            
-            return val;
+            var trashItem = RDRepository.TrashValues.Find(item => item.ID == id);
+            return trashItem != null ? trashItem.Value : 0;
         }
         public static void PlayCashEjectSound()
         {
@@ -107,7 +101,7 @@ namespace RecyclerDumpsterMod
             {
                 // Play the sound using PlayOneShot
                 cachedAudioSource.PlayOneShot(cachedAudioSource.clip); // Play the sound once
-                                                                       //MelonLoader.MelonLogger.Msg("Cash Eject Sound Played!");
+                //MelonLoader.MelonLogger.Msg("Cash Eject Sound Played!");
             }
             else
             {
@@ -115,6 +109,23 @@ namespace RecyclerDumpsterMod
                 MelonLoader.MelonLogger.Msg("No Cash Eject Sound Clip found!");
             }
         }
+        public static bool IsValidJson(string json)
+        {
+            try
+            {
+                JsonConvert.DeserializeObject(json);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
+        internal static void LogUnknownItem(string trashID)
+        {
+
+            MelonLoader.MelonLogger.Msg($"Not yet maintained in RecyclerDumpster.json => {trashID} - modify/notify dev.");
+        }
     }
 }

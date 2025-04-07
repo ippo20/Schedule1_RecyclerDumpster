@@ -5,6 +5,10 @@ using Il2CppScheduleOne.Trash;
 using HarmonyLib;
 using Il2CppScheduleOne.Money;
 using System.Collections;
+using static RecyclerDumpsterMod.RDRepository;
+using Il2CppScheduleOne.DevUtilities;
+using Il2CppScheduleOne.UI.Phone;
+using Il2CppToolBuddy.ThirdParty.VectorGraphics;
 ////using static Il2CppSystem.Linq.Expressions.Interpreter.NullableMethodCallInstruction;
 //using UnityEngine.Playables;
 //using Il2CppScheduleOne.ObjectScripts;
@@ -24,6 +28,7 @@ namespace RecyclerDumpsterMod
         private MoneyManager _moneyManager;
         private List<GameObject> _recDumpCache = new List<GameObject>();
         private GameObject _localPlayer;
+
         public override void OnInitializeMelon()
         {
             MelonLogger.Msg("RecyclerDumpster initialized.");
@@ -31,62 +36,20 @@ namespace RecyclerDumpsterMod
 
         public override void OnUpdate()
         {
-            if (this._localPlayer == null)
+            if (Input.GetKeyDown(RDRepository._CONFIG.HotKey))
             {
-                this._localPlayer = GameObject.Find("Player_Local");
-            }
-
-            if (this._localPlayer != null)
-            {
-                Vector3 pos = this._localPlayer.transform.position;
-                RDProcessor.GenerateClickableDumpster(_recDumpCache, pos);
-
-                if (Input.GetKeyDown(KeyCode.RightBracket)) // ']' key
+                if (this._localPlayer == null)
                 {
-                    //TryRecycler(pos);
-                    //DDD();
+                    this._localPlayer = GameObject.Find("Player_Local");
+                }
+
+                if (this._localPlayer != null)
+                {
+                    Vector3 pos = this._localPlayer.transform.position;
+                    TryRecycler(pos);
                 }
             }
         }
-        //private void DDD()
-        //{
-        //    MelonLogger.Msg($"DDD: Start");
-        //    // Replace 'Dumpster' with your desired class
-        //    var test = GameObject.FindObjectsOfType<Dumpster>();
-        //    foreach (var dumpster in test)
-        //    {
-        //        Type type = dumpster.GetType();
-        //        PropertyInfo[] properties = type.GetProperties();
-        //        MethodInfo[] methods = type.GetMethods();
-
-        //        MelonLogger.Msg($"Dumpster: {dumpster.name}");
-
-        //        // List all properties
-        //        MelonLogger.Msg("Properties:");
-        //        foreach (PropertyInfo property in properties)
-        //        {
-        //            try
-        //            {
-        //                object value = property.GetValue(dumpster, null);
-        //                MelonLogger.Msg($"  {property.Name}: {value}");
-        //                base.LoggerInstance.Msg($"  {property.Name}: {value}");
-        //            }
-        //            catch
-        //            {
-        //                MelonLogger.Msg($"  {property.Name}: (unavailable)");
-        //                base.LoggerInstance.Msg($"  {property.Name}: (unavailable)");
-        //            }
-        //        }
-                
-
-        //        // List all methods
-        //        MelonLogger.Msg("Methods:");
-        //        foreach (MethodInfo method in methods)
-        //        {
-        //            MelonLogger.Msg($"  {method.Name}");
-        //        }
-        //    }
-        //}
         private void TryRecycler(Vector3 pos)
         {
             //MelonLogger.Msg($"Player Position: {player.transform.position}");
@@ -95,19 +58,42 @@ namespace RecyclerDumpsterMod
             {
                 _moneyManager.ChangeCashBalance(addCash, true, false);
                 RDUtility.PlayCashEjectSound();
-            }            
+            }
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
-        {
-            MelonCoroutines.Start(this.WaitForMoneyManager());
-            //if (_recDumpCache.Count <= 0)
-            //{
-            //    RDProcessor.CacheGameObject(_recDumpCache);
-            //    MelonLoader.MelonLogger.Msg($"CacheGameObject [{_recDumpCache.Count}]");
-            //}
-        }
+        {            
 
+            MelonCoroutines.Start(this.WaitForMoneyManager());
+
+            //MelonCoroutines.Start(this.WaitForPlayer(sceneName));
+           
+        }
+        //private IEnumerator WaitForPlayer(string sceneName)
+        //{
+        //    if (sceneName != "Main")
+        //        yield break;
+
+        //    while (PlayerSingleton<AppsCanvas>.Instance == null)
+        //    {
+        //        yield return null;
+        //    }
+        //    MelonLogger.Msg($"Player loaded in Scene:{sceneName}");
+                     
+
+        //    while (PlayerSingleton<AppsCanvas>.Instance == null)
+        //        yield return null;
+
+        //    AppsCanvas player = PlayerSingleton<AppsCanvas>.Instance;
+
+        //    Vector3 pos = player.transform.position;
+        //    MelonLogger.Msg($"{pos} == player pos");
+        //    if (PlayerSingleton<AppsCanvas>.Instance != null)
+        //    {
+        //        RDProcessor.GenerateClickableDumpster(_recDumpCache, pos);
+        //    }
+
+        //}
         private IEnumerator WaitForMoneyManager()
         {
             while (this._moneyManager == null)
