@@ -7,6 +7,7 @@ using System.Collections.Generic;
 //using System.IO;
 using UnityEngine;
 using Newtonsoft.Json;
+using static RecyclerDumpsterMod.RDUtility;
 
 namespace RecyclerDumpsterMod
 {
@@ -80,7 +81,7 @@ namespace RecyclerDumpsterMod
             string jsonContent = File.ReadAllText(jsonPath);
             try
             {
-                if(!RDUtility.IsValidJson(jsonContent)) throw new JsonException("Invalid JSON format.");
+                if(!IsValidJson(jsonContent)) throw new JsonException("Invalid JSON format.");
                 TrashValues = JsonConvert.DeserializeObject<List<TrashValue>>(jsonContent);
                 if (TrashValues == null)
                 {
@@ -128,7 +129,15 @@ namespace RecyclerDumpsterMod
                 ID = "motel1",
                 Name = "Motel Dumpster Front",
                 Position = new Vector3(-55.0832f, 0.8732f, 101.296f),
-                Extent = new Vector3(0.8303f, 0.8169f, 1.8517f)
+                Extent = new Vector3(0.8303f, 0.8169f, 1.8517f),
+                ButtonPosition = new Vector3(-55.1001f, 0.5019f, 99.905f),
+                ButtonPositionAdjustment = new PositionAdjustment
+                {
+                    Forward = -0.5f,
+                    Up = 0.5f,
+                    Right = -0f
+                }
+
             });
 
             RecycableDumpsters.Add(new RecycableDumpster
@@ -136,7 +145,14 @@ namespace RecyclerDumpsterMod
                 ID = "motel2",
                 Name = "Motel Dumpster Side",
                 Position = new Vector3(-71.0901f, 0.8001f, 79.7941f),
-                Extent = new Vector3(1.8671f, 0.8001f, 0.8526f)
+                Extent = new Vector3(1.8671f, 0.8001f, 0.8526f),
+                ButtonPosition = new Vector3(-69.6993f, 0.429f, 79.7664f),
+                ButtonPositionAdjustment = new PositionAdjustment
+                {
+                    Forward = 0f,
+                    Up = 0.5f,
+                    Right = 0f
+                }
             });
 
             RecycableDumpsters.Add(new RecycableDumpster
@@ -144,7 +160,15 @@ namespace RecyclerDumpsterMod
                 ID = "sweatshop",
                 Name = "Sweat Shop",
                 Position = new Vector3(-57.864f, -3.1999f, 151.147f),
-                Extent = new Vector3(1.8517f, 0.8001f, 0.825f)
+                Extent = new Vector3(1.8517f, 0.8001f, 0.825f),
+                ButtonPosition = new Vector3(-59.255f, -3.571f, 151.147f),
+                ButtonPositionAdjustment = new PositionAdjustment
+                {
+                    Forward = 0f,
+                    Up = 0.5f,
+                    Right = -0.5f
+                }
+
             });
 
             RecycableDumpsters.Add(new RecycableDumpster
@@ -152,7 +176,14 @@ namespace RecyclerDumpsterMod
                 ID = "bungalow",
                 Name = "Bungalow",
                 Position = new Vector3(-161.2222f, -3.1986f, 119.2805f),
-                Extent = new Vector3(0.9006f, 0.8013f, 1.8811f)
+                Extent = new Vector3(0.9006f, 0.8013f, 1.8811f),
+                ButtonPosition = new Vector3(-161.2989f, -3.5709f, 117.8972f),
+                ButtonPositionAdjustment = new PositionAdjustment
+                {
+                    Forward = -0.5f,
+                    Up = 0.5f,
+                    Right = -0f
+                }
             });
 
             RecycableDumpsters.Add(new RecycableDumpster
@@ -160,7 +191,14 @@ namespace RecyclerDumpsterMod
                 ID = "barn",
                 Name = "Barn",
                 Position = new Vector3(181.6679f, 0.8001f, -16.536f),
-                Extent = new Vector3(0.825f, 0.8001f, 1.8517f)
+                Extent = new Vector3(0.825f, 0.8001f, 1.8517f),
+                ButtonPosition = new Vector3(181.668f, 0.429f, -15.145f),
+                ButtonPositionAdjustment = new PositionAdjustment
+                {
+                    Forward = -0.5f,
+                    Up = 0.5f,
+                    Right = -0f
+                }
             });
 
             RecycableDumpsters.Add(new RecycableDumpster
@@ -168,12 +206,19 @@ namespace RecyclerDumpsterMod
                 ID = "docks",
                 Name = "Docks Warehouse",
                 Position = new Vector3(-69.5058f, -1.6199f, -63.5107f),
-                Extent = new Vector3(2.012f, 0.8001f, 1.6332f)
+                Extent = new Vector3(2.012f, 0.8001f, 1.6332f),
+                ButtonPosition = new Vector3(-70.7109f, -1.991f, -64.207f),
+                ButtonPositionAdjustment = new PositionAdjustment
+                {
+                    Forward = -0.5f,
+                    Up = 0.5f,
+                    Right = -0.5f
+                }
             });
 
             for (int i = 0; i < RecycableDumpsters.Count; i++)
             {
-                (Vector3 min, Vector3 max) bounds = RDUtility.ComputeBoundsRounded(
+                (Vector3 min, Vector3 max) bounds = ComputeBoundsRounded(
                     RecycableDumpsters[i].Position,
                     RecycableDumpsters[i].Extent,
                     Y_OFFSET
@@ -207,8 +252,22 @@ namespace RecyclerDumpsterMod
             public string Name { get; set; }
             public Vector3 Position { get; set; }
             public Vector3 Extent { get; set; }
+            public Vector3 ButtonPosition { get; set; } = new Vector3(0, 0, 0); // Default value
+            public PositionAdjustment ButtonPositionAdjustment { get; set; } = new PositionAdjustment();
             public Vector3 Min { get; set; }
             public Vector3 Max { get; set; }
+        }
+        [Serializable]
+        public class PositionAdjustment
+        {
+            // Forward adjustment (positive moves forward, negative moves backward)
+            public float Forward { get; set; } = 0f;
+
+            // Upward adjustment (positive moves upward, negative moves downward)
+            public float Up { get; set; } = 0f;
+
+            // Rightward adjustment (positive moves right, negative moves left)
+            public float Right { get; set; } = 0f;
         }
     }
 }
