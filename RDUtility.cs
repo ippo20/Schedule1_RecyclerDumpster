@@ -55,15 +55,15 @@ namespace RecyclerDumpsterMod
 
         public static Vector3 AdjustPosition(Vector3 currentPosition, PositionAdjustment adjustment)
         {
-            if (adjustment.Forward > 0f)
+            if (adjustment.Forward != 0f)
             {
                 currentPosition += Vector3.forward * adjustment.Forward;
             }
-            if (adjustment.Up > 0f)
+            if (adjustment.Up != 0f)
             {
                 currentPosition += Vector3.up * adjustment.Up;
             }
-            if (adjustment.Right > 0f)
+            if (adjustment.Right != 0f)
             {
                 currentPosition += Vector3.right * adjustment.Right;
             }
@@ -72,8 +72,16 @@ namespace RecyclerDumpsterMod
 
         internal static void LogUnknownItem(string trashID)
         {
-
-            MelonLoader.MelonLogger.Msg($"Not yet maintained in RecyclerDumpster.json => {trashID} - modify/notify dev - defaulting to 1$.");
+            LogError($"Not yet maintained in RecyclerDumpster.json => {trashID} - modify/notify dev - defaulting to 1$.", true);
+        }
+        internal static void LogError(string msg, bool forceLog = true)
+        {
+            MelonLogger.Error(msg);
+        }
+        internal static void Log(string msg, bool forceLog=false)
+        {
+            if (Core.DEBUG || forceLog)
+                MelonLogger.Msg(msg);
         }
 
     }

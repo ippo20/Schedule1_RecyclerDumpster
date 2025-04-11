@@ -12,7 +12,7 @@ using Il2CppFluffyUnderware.Curvy.Generator;
 using Il2CppInterop.Runtime;
 using static UnityEngine.RemoteConfigSettingsHelper;
 using UnityEngine.Events;
-
+using static RecyclerDumpsterMod.RDUtility;
 using Il2CppScheduleOne.Interaction;
 
 [assembly: MelonInfo(typeof(RecyclerDumpsterMod.Core), "RecyclerDumpster", "1.0.0", "ippo", null)]
@@ -22,7 +22,11 @@ namespace RecyclerDumpsterMod
 {
     public class Core : MelonMod
     {
-
+#if DEBUG
+        public static readonly bool DEBUG = true;
+#else
+        public static readonly bool DEBUG = false;
+#endif
         private static MoneyManager _moneyManager;
 
         private GameObject _localPlayer;
@@ -35,14 +39,14 @@ namespace RecyclerDumpsterMod
 
         public override void OnInitializeMelon()
         {
-            MelonLogger.Msg("RecyclerDumpster initialized");
+            Log("RecyclerDumpster initialized");
             
                 string s = "Credits to the following: ";
             foreach (CreditsTo thx in _thx)
             {
                 s+=$"{thx.ModName} - {thx.Author} | ";
             }
-            MelonLogger.Msg(s);
+            Log(s);
         }
 
         public override void OnUpdate()
@@ -77,7 +81,7 @@ namespace RecyclerDumpsterMod
             while (PlayerSingleton<AppsCanvas>.Instance == null)
                 yield return null;
 
-            MelonLogger.Msg($"Player loaded in Scene:{sceneName}");
+            Log($"Player loaded in Scene:{sceneName}");
             RDProcessor.GenerateClickableDumpster();            
 
         }
@@ -101,7 +105,7 @@ namespace RecyclerDumpsterMod
             }
             else
             {
-                MelonLogger.Error("MoneyManager is not initialized.");
+                LogError("MoneyManager is not initialized.");
             }
         }
 

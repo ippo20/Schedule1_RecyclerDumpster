@@ -92,7 +92,7 @@ namespace RecyclerDumpsterMod
             }
             catch (Exception ex)
             {
-                MelonLogger.Error($"Unexpected error: {ex.Message}");
+                MelonLogger.Error($"Unexpected error: {ex.Message}", true);
                 throw;
             }
         }
@@ -134,8 +134,8 @@ namespace RecyclerDumpsterMod
                 ButtonPositionAdjustment = new PositionAdjustment
                 {
                     Forward = -0.5f,
-                    Up = 0.5f,
-                    Right = -0f
+                    Up = 0.85f,
+                    //Right = -0f
                 }
 
             });
@@ -149,9 +149,9 @@ namespace RecyclerDumpsterMod
                 ButtonPosition = new Vector3(-69.6993f, 0.429f, 79.7664f),
                 ButtonPositionAdjustment = new PositionAdjustment
                 {
-                    Forward = 0f,
-                    Up = 0.5f,
-                    Right = 0f
+                    //Forward = 0f,
+                    Up = 0.85f,
+                    Right = 0.5f
                 }
             });
 
@@ -164,8 +164,8 @@ namespace RecyclerDumpsterMod
                 ButtonPosition = new Vector3(-59.255f, -3.571f, 151.147f),
                 ButtonPositionAdjustment = new PositionAdjustment
                 {
-                    Forward = 0f,
-                    Up = 0.5f,
+                    //Forward = 0.5f,
+                    Up = 0.85f,
                     Right = -0.5f
                 }
 
@@ -181,8 +181,8 @@ namespace RecyclerDumpsterMod
                 ButtonPositionAdjustment = new PositionAdjustment
                 {
                     Forward = -0.5f,
-                    Up = 0.5f,
-                    Right = -0f
+                    Up = 0.85f,
+                    //Right = -0f
                 }
             });
 
@@ -195,9 +195,9 @@ namespace RecyclerDumpsterMod
                 ButtonPosition = new Vector3(181.668f, 0.429f, -15.145f),
                 ButtonPositionAdjustment = new PositionAdjustment
                 {
-                    Forward = -0.5f,
-                    Up = 0.5f,
-                    Right = -0f
+                    Forward = 0.5f,
+                    Up = 0.85f,
+                    //Right = -0f
                 }
             });
 
@@ -210,9 +210,9 @@ namespace RecyclerDumpsterMod
                 ButtonPosition = new Vector3(-70.7109f, -1.991f, -64.207f),
                 ButtonPositionAdjustment = new PositionAdjustment
                 {
-                    Forward = -0.5f,
-                    Up = 0.5f,
-                    Right = -0.5f
+                    Forward = -0.1f,
+                    Up = 0.85f,
+                    Right = -0.25f
                 }
             });
 
