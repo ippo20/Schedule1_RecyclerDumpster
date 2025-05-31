@@ -4,6 +4,7 @@ using MelonLoader;
 using System.Collections;
 using UnityEngine;
 using static RecyclerDumpsterMod.RDRepository;
+using Il2CppScheduleOne.Property;
 
 namespace RecyclerDumpsterMod
 {
@@ -69,6 +70,19 @@ namespace RecyclerDumpsterMod
             }
             return currentPosition;
         }
+
+        public static List<string> GetOwnedPropertyNames()
+        {
+            var result = new List<string>();
+            if (Property.OwnedProperties == null || Property.OwnedProperties.Count == 0)
+                return result;
+
+            foreach (var p in Property.OwnedProperties)
+                result.Add(p.name);
+
+            return result;
+        }
+
 
         internal static void LogUnknownItem(string trashID)
         {

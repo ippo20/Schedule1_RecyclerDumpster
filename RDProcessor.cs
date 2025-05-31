@@ -26,6 +26,8 @@ namespace RecyclerDumpsterMod
     public static class RDProcessor
     { 
         const float FOV_RAD = 7f; // FOV radius for interaction
+        const string COLLIDER_NAME = "Collider (2)";
+        const string TRASH_REM_NAME = "Trash remover";
         static readonly List<RecycableDumpster> RecycableDumpsters = RDRepository.RecycableDumpsters;
 
         static UnityAction unityAction = DelegateSupport.ConvertDelegate<UnityAction>(new Action(delegate        {
@@ -33,34 +35,60 @@ namespace RecyclerDumpsterMod
             DoRecycle();
         }));
 
-        public static int CleanWithinVicinity()
+        public static int CleanAllProperties()
         {
-            Vector3 playerPos = PlayerSingleton<AppsCanvas>.Instance.transform.position;
-            RecycableDumpster dumpster = new();
-            foreach (RecycableDumpster rd in RecycableDumpsters)
+            int total = 0;
+            List<string> ownedProperties = RDUtility.GetOwnedPropertyNames();
+
+            foreach (var dumpster in RecycableDumpsters)
             {
-                if (Vector3.Distance(playerPos, rd.Position) <= FOV_RAD)
-                {
-                    dumpster = rd;
-                    //Log($"Found dumpster: {rd.Name} at {rd.Position}.");
-                    break;
-                }
-            }
-            if (dumpster.Name == null)
-            {
-                //MelonLoader.Log($"No dumpster found within vicinity.");
-                return 0;
-            }
-            TrashItem[] allTrashItems = GameObject.FindObjectsOfType<TrashItem>();
-           
-            int cashValue = 0;
-            int trashCnt = 0;
-            foreach (TrashItem item in allTrashItems)
-            {
-                if (!IsWithinRectangle(item.transform.position, dumpster.Min, dumpster.Max))
+                if (dumpster.ButtonPosition == Vector3.zero)
                     continue;
 
-                //Log($"Processing: {item.ID} at {item.transform.position}");
+                if (!ownedProperties.Contains(dumpster.PropertyName))
+                    continue;
+
+                int value = ProcessTrashInArea(dumpster.Min, dumpster.Max);
+                if (value > 0)
+                    Log($"processed {dumpster.Name} : for : {value}");
+
+                total += value;
+                Log($"---------running cash total: {total}");
+            }
+
+            return total;
+        }
+
+        public static int CleanWithinVicinity()
+        {
+
+            List<string> ownedProperties = RDUtility.GetOwnedPropertyNames();
+            Vector3 playerPos = PlayerSingleton<AppsCanvas>.Instance.transform.position;
+            //RecycableDumpster dumpster = RecycableDumpsters.FirstOrDefault(rd => Vector3.Distance(playerPos, rd.Position) <= FOV_RAD);
+            RecycableDumpster dumpster = RecycableDumpsters.FirstOrDefault(rd => 
+                Vector3.Distance(playerPos, rd.Position) <= FOV_RAD && ownedProperties.Contains(rd.PropertyName));
+
+            if (dumpster == null || dumpster.Name == null)
+                return 0;
+
+            int cash = ProcessTrashInArea(dumpster.Min, dumpster.Max);
+            if (cash > 0)
+                Log($"processed: paid : {cash}");
+
+            return cash;
+        }
+
+        private static int ProcessTrashInArea(Vector3 min, Vector3 max)
+        {
+            TrashItem[] allTrashItems = GameObject.FindObjectsOfType<TrashItem>();
+            int cashValue = 0;
+            int trashCnt = 0;
+
+            foreach (TrashItem item in allTrashItems)
+            {
+                if (!IsWithinRectangle(item.transform.position, min, max))
+                    continue;
+
                 int c = 0;
                 if (item.ID == "trashbag")
                 {
@@ -68,26 +96,25 @@ namespace RecyclerDumpsterMod
                     TrashBag bag = item.GetComponent<TrashBag>();
                     if (bag != null)
                     {
-                        //bagsProcessed++;
                         int ctot = 0;
                         int cCnt = 0;
+
                         foreach (TrashContent.Entry baggedItem in bag.Content.Entries)
                         {
-
-                            c = 0;
                             c = GetValueFromRepo(baggedItem.TrashID);
                             if (c == 0)
                             {
                                 LogUnknownItem(baggedItem.TrashID);
-                                c = 1; //give consolation;
+                                c = 1;
                             }
+
                             ctot += c * baggedItem.Quantity;
                             Log($"{item.ID}[{trashCnt}] Item[{++cCnt} {baggedItem.TrashID}] = {c} * {baggedItem.Quantity} = {ctot}");
                         }
-                        c = ctot;
-                        cashValue += c;
-                        Log($"{item.ID}[{trashCnt}] : Total {c}");
-                        Log($"---------runnning cash total: {cashValue}");
+
+                        cashValue += ctot;
+                        Log($"{item.ID}[{trashCnt}] : subtotal {ctot}");
+                        Log($"---------running cash subtotal: {cashValue}");
                     }
                     else
                     {
@@ -97,6 +124,7 @@ namespace RecyclerDumpsterMod
                             LogUnknownItem(item.ID);
                             c = 1;
                         }
+
                         cashValue += c;
                         Log($"Error Trashbag[{++trashCnt}] :          : {cashValue}");
                     }
@@ -110,33 +138,21 @@ namespace RecyclerDumpsterMod
 
                 if (c <= 0)
                 {
-                    //MelonLoader.Log($"Item {item.ID} is not yet configured in JSON... report to dev... ignoring for now.");
                     LogUnknownItem(item.ID);
-                    c = 1; //give consolation;
+                    c = 1;
                     cashValue += c;
                 }
 
                 item.DestroyTrash();
-
             }
 
-            if (cashValue > 0)
-            {
-
-                Log($"processed: {trashCnt} : paid : {cashValue}");
-                return cashValue;
-            }
-
-            return 0;
+            return cashValue;
         }
+
         public static void objAttachAction(GameObject gameObj, PositionAdjustment adj)
         {
-            //GameObject obj = GameObject.Instantiate(gameObj);
             GameObject obj = GameObject.Instantiate(gameObj, gameObj.transform.position, gameObj.transform.rotation);
-            //obj.transform.localScale *= 5f;            
             obj.name = "RecyclerDumpsterInteractionObject";
-            //Vector3 position = obj.transform.position;
-            //obj.transform.position = AdjustPosition(position, adj);
             //MelonLoader.Log($"GenerateClickableDumpster => Collider (2) @{obj.transform.position}");
             if (obj.GetComponent<InteractableObject>() == null)
             {
@@ -162,57 +178,76 @@ namespace RecyclerDumpsterMod
             
         }
 
-        public static void DoRecycle()
+        public static void DoRecycle(bool all = false)
         {
-            int addCash = CleanWithinVicinity();
+            int addCash = all ? CleanAllProperties() : CleanWithinVicinity();  // Choose method based on 'all'
+
             if (addCash > 0)
             {
                 Core.ChangeCashBalance(addCash);
                 Log($"Trash2Cash: {addCash}");
-                //RDUtility.PlayCashEjectSound();
+                // RDUtility.PlayCashEjectSound();  // Optional
             }
         }
-
-        public static void GenerateClickableDumpster()
+        public static void PatchDumpsters()
         {
-            //Log($"GenerateClickableDumpster start");            
+            Log("PatchDumpsters start");
 
-            Vector3 zeroPos = new Vector3(0, 0, 0);
+            Vector3 zeroPos = Vector3.zero;
             List<RecycableDumpster> localDumpsters = new List<RecycableDumpster>(RecycableDumpsters);
+
             for (int i = localDumpsters.Count - 1; i >= 0; i--)
             {
-                RecycableDumpster localDumpster = localDumpsters[i];
-                //Log($"GenerateClickableDumpster => localDumpsters[{i}] {localDumpster.Name} at {localDumpster.Position}");
-                if (localDumpster.ButtonPosition == zeroPos)
+                var dumpster = localDumpsters[i];
+                if (dumpster.ButtonPosition == zeroPos)
                 {
                     localDumpsters.RemoveAt(i);
-                    //Log($"GenerateClickableDumpster removing localdump");
+                    continue;
                 }
-            }
-                        
-            foreach (GameObject obj in UnityEngine.Object.FindObjectsOfType<GameObject>())
-            {
-                if (obj.name == "Collider (2)")
+
+                Collider[] nearby = Physics.OverlapSphere(dumpster.ButtonPosition, 1f);
+                GameObject trashObj = null;
+                GameObject colliderObj = null;
+
+                foreach (var col in nearby)
                 {
-                    for (int i = 0; i < localDumpsters.Count; i++)
+                    var obj = col.gameObject;
+
+                    if (trashObj == null && obj.name == TRASH_REM_NAME)
+                        trashObj = obj;
+
+                    if (colliderObj == null && obj.name == COLLIDER_NAME)
+                        colliderObj = obj;
+
+                    if (trashObj != null && colliderObj != null)
+                        break;
+                }
+
+                if (RDRepository._CONFIG.DisableAutoTrashRemoval)
+                {
+                    if (trashObj != null)
                     {
-                        RecycableDumpster localDumpster = localDumpsters[i];
-                        float dist = Vector3.Distance(obj.transform.position, localDumpster.ButtonPosition);                            
-                        if (dist < 1f)
+                        var trashRemover = trashObj.GetComponent<Il2CppScheduleOne.Trash.TrashRemovalVolume>();
+                        if (trashRemover != null)
                         {
-                            obj.tag = $"button_{localDumpster.ID}";                            ;
-                            localDumpsters.RemoveAt(i);
-                            objAttachAction(obj, localDumpster.ButtonPositionAdjustment);
-                            break;
+                            trashRemover.RemovalChance = 0f;
+                            Log($"Set RemovalChance = 0 for: {trashObj.name} of {dumpster.Name}");
                         }
                     }
                 }
-                if (localDumpsters.Count == 0)
+
+                if (colliderObj != null)
                 {
-                    break;
+                    colliderObj.tag = $"button_{dumpster.ID}";
+                    objAttachAction(colliderObj, dumpster.ButtonPositionAdjustment);
+                }
+
+                if (trashObj != null || colliderObj != null)
+                {
+                    localDumpsters.RemoveAt(i);
                 }
             }
-
         }
+
     }
 }
