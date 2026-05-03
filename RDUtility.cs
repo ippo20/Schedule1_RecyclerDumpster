@@ -97,6 +97,20 @@ namespace RecyclerDumpsterMod
             if (Core.DEBUG || forceLog)
                 MelonLogger.Msg(msg);
         }
+        public static bool TryParseVersion(string input, out Version version)
+        {
+            version = null;
 
+            try
+            {
+                var cleaned = new string(input.Where(c => char.IsDigit(c) || c == '.').ToArray());
+                version = new Version(cleaned);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

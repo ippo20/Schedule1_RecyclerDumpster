@@ -14,7 +14,6 @@ using Il2CppScheduleOne.ObjectScripts;
 using Il2CppScheduleOne.PlayerScripts;
 using Il2CppScheduleOne.DevUtilities;
 using Il2CppScheduleOne.UI.Phone;
-using Il2CppFishNet.Demo.AdditiveScenes;
 using Il2CppFluffyUnderware.Curvy.Generator;
 using static UnityEngine.RemoteConfigSettingsHelper;
 using UnityEngine.Rendering.PostProcessing;
