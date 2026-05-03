@@ -4,6 +4,7 @@ using MelonLoader;
 using System.Collections;
 using UnityEngine;
 using static RecyclerDumpsterMod.RDRepository;
+using Il2CppScheduleOne.Property;
 
 namespace RecyclerDumpsterMod
 {
@@ -55,26 +56,61 @@ namespace RecyclerDumpsterMod
 
         public static Vector3 AdjustPosition(Vector3 currentPosition, PositionAdjustment adjustment)
         {
-            if (adjustment.Forward > 0f)
+            if (adjustment.Forward != 0f)
             {
                 currentPosition += Vector3.forward * adjustment.Forward;
             }
-            if (adjustment.Up > 0f)
+            if (adjustment.Up != 0f)
             {
                 currentPosition += Vector3.up * adjustment.Up;
             }
-            if (adjustment.Right > 0f)
+            if (adjustment.Right != 0f)
             {
                 currentPosition += Vector3.right * adjustment.Right;
             }
             return currentPosition;
         }
 
-        internal static void LogUnknownItem(string trashID)
+        public static List<string> GetOwnedPropertyNames()
         {
+            var result = new List<string>();
+            if (Property.OwnedProperties == null || Property.OwnedProperties.Count == 0)
+                return result;
 
-            MelonLoader.MelonLogger.Msg($"Not yet maintained in RecyclerDumpster.json => {trashID} - modify/notify dev - defaulting to 1$.");
+            foreach (var p in Property.OwnedProperties)
+                result.Add(p.name);
+
+            return result;
         }
 
+
+        internal static void LogUnknownItem(string trashID)
+        {
+            LogError($"Not yet maintained in RecyclerDumpster.json => {trashID} - modify/notify dev - defaulting to 1$.", true);
+        }
+        internal static void LogError(string msg, bool forceLog = true)
+        {
+            MelonLogger.Error(msg);
+        }
+        internal static void Log(string msg, bool forceLog=false)
+        {
+            if (Core.DEBUG || forceLog)
+                MelonLogger.Msg(msg);
+        }
+        public static bool TryParseVersion(string input, out Version version)
+        {
+            version = null;
+
+            try
+            {
+                var cleaned = new string(input.Where(c => char.IsDigit(c) || c == '.').ToArray());
+                version = new Version(cleaned);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }
