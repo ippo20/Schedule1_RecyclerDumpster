@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using static RecyclerDumpsterMod.RDUtility;
 //using Application.version;
 
-[assembly: MelonInfo(typeof(RecyclerDumpsterMod.Core), "RecyclerDumpster", "3.1.0", "ippo", null)]
+[assembly: MelonInfo(typeof(RecyclerDumpsterMod.Core), "RecyclerDumpster", "3.2.0", "ippo", null)]
 [assembly: MelonGame("TVGS", "Schedule I")]
 
 namespace RecyclerDumpsterMod
